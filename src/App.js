@@ -14,48 +14,54 @@ export default function App() {
 
 function NumberPad(){
 
-  const [num, setNum] = useState("")
-  const [operator, setOperator] = useState("")
-  const [total, setTotal] = useState(0)
+  const [calc, setCalc] = useState({
+    num1: "",
+    operator: "",
+    num2: "",
+    total: 0
+  })
+
 
   function handleSetOperator(op){
-    setOperator(op)
+    setCalc((prev) => ({...prev, operator: op}))
   }
 
-  function handleSetNumber(number){
-    setNum((prev) => prev + number)
+  function handleSetNumber(newNumber){
+    if (calc.operator === ""){
+      setCalc((prev) => ({ ...prev, num1: (prev.num1 === '0' ? '' : prev.num1) + newNumber }))
+    }
+    else{
+      setCalc((prev) => ({...prev, num2: (prev.num2 === '0' ? '' : prev.num2) + newNumber }))
+    }
     
 }
   
 
   function handleEquation(){
-
-    const numValue = parseFloat(num); // Parse num as float
-    if(operator === ""){
-      setTotal(numValue)
-    }
     
-    switch(operator){
+    switch(calc.operator){
       case '+':
-        setTotal((prevTotal) => prevTotal + numValue)
-        break;
+         setCalc((curr) => ({...curr, total: Number(curr.num1) + Number(curr.num2)}))
+         break;
       case '-':
-        setTotal((prevTotal) => prevTotal - numValue)
+        setCalc((curr) => ({...curr, total: Number(curr.num1) - Number(curr.num2)}))
         break;
       case '*':
-        setTotal((prevTotal) => prevTotal * numValue)
+        setCalc((curr) => ({...curr, total: Number(curr.num1) * Number(curr.num2)}))
         break;
       case '/':
-        setTotal((prevTotal) => prevTotal / numValue)
+        setCalc((curr) => ({...curr, total: Number(curr.num1) / Number(curr.num2)}))
         break;
     }
-    setNum("")
   }
 
   function handleAllClear(){
-    setNum("")
-    setOperator("")
-    setTotal("")
+    setCalc({
+      num1: "",
+      operator: "",
+      num2: "", 
+      total: 0
+    })
   }
 
   return(
@@ -65,16 +71,20 @@ function NumberPad(){
       </div>
 
       <div>
+        {(calc.total) ? (<button value={'ac'} onClick={handleAllClear}>AC</button> ) 
+        : (
+          <>
         <button value={'+'} onClick={(e) => handleSetOperator(e.target.value)}>+</button>
         <button value={'-'} onClick={(e) => handleSetOperator(e.target.value)}>-</button>
         <button value={'*'} onClick={(e) => handleSetOperator(e.target.value)}>*</button>
         <button value={'/'} onClick={(e) => handleSetOperator(e.target.value)}>/</button>
-
         <button value={'='} onClick={handleEquation}>=</button> 
-        <button value={'ac'} onClick={handleAllClear}>AC</button>       
+        </>
+        )
+}
       </div>
-      <p>{num} {operator} {num}</p>
-      <p>Your total is: {total}</p>
+      <p>{calc.num1} {calc.operator} {calc.num2} </p>
+      <p>{calc.total !== 0 && (<p>Your total is: {calc.total.toFixed(2)}</p>)}</p>
     </div>
   )
 }
